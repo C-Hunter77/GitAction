@@ -1,28 +1,27 @@
-name: Run Cypress Component Tests
+name: Run Cypress component tests
 
 on:
   pull_request:
     branches: [develop]
 
 jobs:
-  cypress-tests:
+  component-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node
+      - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: |
-          npm install
-          cd client
-          npm install
-          cd ../
+        run: npm install
 
-      - name: Run Cypress component tests
+      - name: Verify Cypress cache setup
+        run: npx cypress install
+
+      - name: Run Cypress Component Tests
         run: npx cypress run-ct
