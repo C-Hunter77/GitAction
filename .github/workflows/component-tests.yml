@@ -2,27 +2,26 @@ name: Run Cypress Component Tests
 
 on:
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
 
 jobs:
-  cypress-tests:
+  cypress-component-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: |
-          npm install
-          cd client
-          npm install
-          cd ../
+        run: npm ci
 
-      - name: Run Cypress component tests
-        run: npx cypress run-ct
+      - name: Run Cypress Component Tests
+        uses: cypress-io/github-action@v6
+        with:
+          component: true
