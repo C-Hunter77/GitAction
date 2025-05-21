@@ -1,13 +1,23 @@
-// server/src/seeds/seed.ts
+import db from '../config/connection.js';
+import cleanDB from './cleanDb.js';
 import Question from '../models/Question.js';
-import pythonQuestions from './pythonQuestions.json' assert { type: 'json' };
+import { createRequire } from 'module';
+
+// Create a CommonJS require in ESM land
+const require = createRequire(import.meta.url);
+// Load your JSON directly
+const pythonQuestions: {
+  question: string;
+  answers: string[];
+  correct: number;
+}[] = require('./pythonQuestions.json');
 
 export default async function seedDB() {
-  // 🗑️ wipe the collection
-  const deleted = await Question.deleteMany({});
-  console.log(`Cleared ${deleted.deletedCount} old questions.`);
+  // 1️⃣ Clean the collection
+  await cleanDB('Question', 'questions');
+  console.log('🗑  questions collection cleaned.');
 
-  // 🌱 insert fresh ones
+  // 2️⃣ Insert your JSON data
   const inserted = await Question.insertMany(pythonQuestions);
-  console.log(`Inserted ${inserted.length} questions.`);
+  console.log(`✅ Inserted ${inserted.length} questions.`);
 }
