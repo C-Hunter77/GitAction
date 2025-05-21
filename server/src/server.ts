@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import path, { dirname, join } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import db from './config/connection.js';
