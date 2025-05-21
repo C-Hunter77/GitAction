@@ -7,6 +7,6 @@ export interface Answer {
 
 export interface Question {
   _id: string;
-  text: string;
+  question: string;    // ← note: "question" not "text"
   answers: Answer[];
 }
