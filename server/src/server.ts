@@ -1,32 +1,29 @@
+// server/src/server.ts
 import express from 'express';
-import path from 'path';
 import dotenv from 'dotenv';
+import { resolve, join } from 'path';
 import db from './config/connection.js';
-
-// 👇 Import your actual API router:
-import questionRoutes from './routes/api/questionRoutes.js';
+import questionRouter from './routes/api/questionRoutes.js';
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// 1️⃣ JSON API under /api/questions
 app.use(express.json());
+app.use('/api/questions', questionRouter);
 
-// 1) Mount your API under /api *before* any static/fallback
-app.use('/api/questions', questionRoutes);
-// (if you have more API endpoints, mount them here too)
-// e.g. app.use('/api/users', userRoutes);
+// 2️⃣ Serve static React build from client/dist
+const clientDistPath = resolve(process.cwd(), 'client', 'dist');
+app.use(express.static(clientDistPath));
 
-// 2) Serve the React build
-const clientDist = path.resolve(process.cwd(), 'client', 'dist');
-app.use(express.static(clientDist));
-
-// 3) Only now do the SPA fallback for *other* routes
+// 3️⃣ SPA fallback — everything else returns index.html
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(clientDist, 'index.html'));
+  res.sendFile(join(clientDistPath, 'index.html'));
 });
 
-// 4) Connect to DB and start listening
+// 4️⃣ Connect DB & start server
 db.once('open', () => {
   app.listen(PORT, () =>
     console.log(`🚀 Server running at http://localhost:${PORT}`)
