@@ -1,11 +1,10 @@
-import db from '../config/connection.js';
+// server/src/seeds/seed.ts
 import cleanDB from './cleanDb.js';
 import Question from '../models/Question.js';
 import { createRequire } from 'module';
 
-// Create a CommonJS require in ESM land
+// Create a CommonJS require so we can load JSON
 const require = createRequire(import.meta.url);
-// Load your JSON directly
 const pythonQuestions: {
   question: string;
   answers: string[];
