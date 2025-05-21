@@ -1,33 +1,34 @@
 import express from 'express';
+import path from 'path';
 import dotenv from 'dotenv';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-
 import db from './config/connection.js';
 
-dotenv.config();
+// 👇 Import your actual API router:
+import questionRoutes from './routes/api/questionRoutes.js';
 
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// 👇 ESM-compatible __dirname workaround
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Middleware
 app.use(express.json());
 
-// ✅ Serve static assets from client/dist
-app.use(express.static(join(__dirname, '../../client/dist')));
+// 1) Mount your API under /api *before* any static/fallback
+app.use('/api/questions', questionRoutes);
+// (if you have more API endpoints, mount them here too)
+// e.g. app.use('/api/users', userRoutes);
 
-// ✅ Fallback route for React Router
+// 2) Serve the React build
+const clientDist = path.resolve(process.cwd(), 'client', 'dist');
+app.use(express.static(clientDist));
+
+// 3) Only now do the SPA fallback for *other* routes
 app.get('*', (_req, res) => {
-  res.sendFile(join(__dirname, '../../client/dist/index.html'));
+  res.sendFile(path.join(clientDist, 'index.html'));
 });
 
-// Start after DB connects
+// 4) Connect to DB and start listening
 db.once('open', () => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-  });
+  app.listen(PORT, () =>
+    console.log(`🚀 Server running at http://localhost:${PORT}`)
+  );
 });
