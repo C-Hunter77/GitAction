@@ -1,3 +1,4 @@
+// client/src/components/Quiz.tsx
 import { useState } from 'react';
 import type { Question } from '../models/Question.js';
 import { getQuestions } from '../services/questionApi.js';
@@ -8,43 +9,46 @@ export default function Quiz() {
   const [score, setScore] = useState(0);
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string| null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
 
-  async function startQuiz() {
+  const startQuiz = async () => {
     setLoading(true);
     setError(null);
+
     try {
       const data = await getQuestions();
       setQuestions(data);
       setStarted(true);
     } catch (err: any) {
-      console.error('fetch questions failed', err);
+      console.error('Failed to fetch questions:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  // 1) Show loading state
+  if (loading) {
+    return <div className="loader">Loading…</div>;
   }
 
-  function handleAnswer(choiceIdx: number) {
-    if (questions[currentIdx].correct === choiceIdx) {
-      setScore(s => s + 1);
-    }
-    const next = currentIdx + 1;
-    if (next < questions.length) {
-      setCurrentIdx(next);
-    } else {
-      setFinished(true);
-    }
+  // 2) Show error state
+  if (error) {
+    return <div className="error">Error: {error}</div>;
   }
 
-  // 1) Loading state
-  if (loading) return <div className="loader">Loading…</div>;
-  // 2) Error state
-  if (error) return <div className="error">Error: {error}</div>;
-  // 3) Not started
-  if (!started) return <button onClick={startQuiz}>Start Quiz</button>;
-  // 4) Finished
+  // 3) Show Start button before quiz begins
+  if (!started) {
+    return <button onClick={startQuiz}>Start Quiz</button>;
+  }
+
+  // 4) If we fetched but got no questions
+  if (questions.length === 0) {
+    return <div>No questions available.</div>;
+  }
+
+  // 5) Show final score when done
   if (finished) {
     return (
       <div className="results">
@@ -53,8 +57,20 @@ export default function Quiz() {
     );
   }
 
-  // 5) Show current question
+  // 6) Render the current question
   const q = questions[currentIdx];
+  const handleAnswer = (choiceIdx: number) => {
+    if (q.correct === choiceIdx) {
+      setScore(s => s + 1);
+    }
+    const next = currentIdx + 1;
+    if (next < questions.length) {
+      setCurrentIdx(next);
+    } else {
+      setFinished(true);
+    }
+  };
+
   return (
     <div className="quiz">
       <h3>{currentIdx + 1}. {q.question}</h3>
