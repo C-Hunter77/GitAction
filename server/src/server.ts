@@ -1,6 +1,8 @@
 import express from 'express';
-import path from 'path';
 import dotenv from 'dotenv';
+import path, { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
 import db from './config/connection.js';
 
 dotenv.config();
@@ -8,18 +10,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// 👇 ESM-compatible __dirname workaround
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Middleware
 app.use(express.json());
 
-// ✅ Serve static files from client/dist (adjusted for compiled dist/server.js path)
-app.use(express.static(path.join(__dirname, '../../client/dist')));
+// ✅ Serve static assets from client/dist
+app.use(express.static(join(__dirname, '../../client/dist')));
 
-// ✅ Fallback route for SPA support
+// ✅ Fallback route for React Router
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  res.sendFile(join(__dirname, '../../client/dist/index.html'));
 });
 
-// ✅ Start server after DB connects
+// Start after DB connects
 db.once('open', () => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
