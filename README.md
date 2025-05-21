@@ -33,7 +33,7 @@ An interactive fullstack quiz application built with TypeScript, React, Express,
 ---
 
 ## 📂 Project Structure
-
+```plaintext
 /
 ├── client/             # React frontend
 │   └── src/
