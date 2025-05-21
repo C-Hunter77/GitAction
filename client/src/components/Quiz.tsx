@@ -4,20 +4,19 @@ import type { Question, Answer } from '../models/Question.js';
 import { getQuestions } from '../services/questionApi.js';
 
 export default function Quiz() {
-  // New shapes: Question.text, Answer.text/isCorrect
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
 
   const startQuiz = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getQuestions();  // now returns Question[]
+      const data = await getQuestions();
       setQuestions(data);
       setStarted(true);
     } catch (err: any) {
@@ -28,15 +27,10 @@ export default function Quiz() {
     }
   };
 
-  // 1️⃣ loading
   if (loading) return <div>Loading…</div>;
-  // 2️⃣ error
-  if (error) return <div className="error">Error: {error}</div>;
-  // 3️⃣ not started
+  if (error)   return <div className="error">Error: {error}</div>;
   if (!started) return <button onClick={startQuiz}>Start Quiz</button>;
-  // 4️⃣ no questions
   if (questions.length === 0) return <div>No questions available.</div>;
-  // 5️⃣ finished
   if (finished) {
     return (
       <div className="results">
@@ -45,7 +39,6 @@ export default function Quiz() {
     );
   }
 
-  // 6️⃣ render current question
   const q = questions[currentIdx];
   const handleAnswer = (ans: Answer) => {
     if (ans.isCorrect) setScore(s => s + 1);
@@ -59,7 +52,7 @@ export default function Quiz() {
 
   return (
     <div className="quiz">
-      <h3>{currentIdx + 1}. {q.text}</h3>
+      <h3>{currentIdx + 1}. {q.question}</h3>  {/* ← use q.question */}
       <ul>
         {q.answers.map((ans) => (
           <li key={ans._id}>
