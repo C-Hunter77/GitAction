@@ -13,7 +13,8 @@
     "render-build": "npm install && npm run build",
     "test": "npx cypress run --browser electron",
     "test-component": "npx cypress run --component",
-    "test-gui": "npx cypress open"
+    "test-gui": "npx cypress open",
+    "postinstall": "npm install --prefix client && npm run build --prefix client"
 },
 
   "keywords": [],
